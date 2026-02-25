@@ -6,5 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Claim extends Model
 {
-    //
+    protected $fillable = ['user_id', 'title', 'description', 'amount', 'status'];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(ClaimLog::class);
+    }
 }
