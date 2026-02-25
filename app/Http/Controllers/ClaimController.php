@@ -23,7 +23,8 @@ class ClaimController extends Controller
         $validate = Validator::make($request->all(), [
             'title' => 'required|string',
             'description' => 'required|string',
-            'amount' => 'required|numeric|min:0'
+            'amount' => 'required|numeric|min:0',
+            'attachment' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         if ($validate->fails()) {
@@ -35,7 +36,17 @@ class ClaimController extends Controller
         }
 
         try {
-            $claim = $this->claimService->createClaim($request->all(), $request->user()->id);
+            // Siapkan data array
+            $data = $request->only(['title', 'description', 'amount']);
+
+            // Handle file upload jika ada
+            if ($request->hasFile('attachment')) {
+                // Simpan ke storage/app/public/claims
+                $path = $request->file('attachment')->store('claims', 'public');
+                $data['attachment_path'] = $path;
+            }
+
+            $claim = $this->claimService->createClaim($data, $request->user()->id);
 
             return response()->json([
                 "code" => 200,

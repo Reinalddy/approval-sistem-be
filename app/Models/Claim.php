@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Claim extends Model
 {
-    protected $fillable = ['user_id', 'title', 'description', 'amount', 'status'];
+    protected $fillable = ['user_id', 'title', 'description', 'amount', 'status', 'attachment_path'];
 
     public function user()
     {
@@ -15,6 +15,6 @@ class Claim extends Model
 
     public function logs()
     {
-        return $this->hasMany(ClaimLog::class);
+        return $this->hasMany(ClaimLogs::class);
     }
 }

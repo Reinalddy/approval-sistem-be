@@ -21,6 +21,7 @@ class ClaimService
                 'description' => $data['description'],
                 'amount' => $data['amount'],
                 'status' => 'draft',
+                'attachment_path' => $data['attachment_path'] ?? null,
             ]);
 
             return $claim;
