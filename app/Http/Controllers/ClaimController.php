@@ -186,4 +186,28 @@ class ClaimController extends Controller
             throw new \Exception("Role {$role} tidak memiliki izin untuk mengubah status menjadi {$newStatus}");
         }
     }
+
+    // Method untuk mengambil data statistik Chart & Cards
+    public function getStats(Request $request)
+    {
+        try {
+            $stats = $this->claimService->getClaimStats($request->user());
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Get Stats Berhasil',
+                'data' => $stats
+            ], 200);
+
+        } catch (\Exception $e) {
+            $message = $e->getMessage() . " | " . $e->getFile() . " | " . $e->getLine();
+            Log::critical($message);
+
+            return response()->json([
+                'code' => 500,
+                'message' => 'Gagal mengambil statistik klaim',
+                'errors' => $message
+            ], 500);
+        }
+    }
 }

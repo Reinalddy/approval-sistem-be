@@ -78,4 +78,39 @@ class ClaimService
             throw new \Exception("Transisi status dari {$current} ke {$next} tidak valid. Transisi harus berurutan.");
         }
     }
+
+    /**
+     * Mengambil statistik klaim berdasarkan Role (Aman & Agregat)
+     */
+    public function getClaimStats($user)
+    {
+        $query = Claim::query();
+
+        // Rule RBAC untuk Statistik
+        if ($user->role->name === 'User') {
+            // User HANYA boleh melihat statistik klaim miliknya sendiri
+            $query->where('user_id', $user->id);
+        } else {
+            // Verifier dan Approver melihat statistik global,
+            // TAPI kecualikan 'draft' karena draft adalah privasi User yang belum disubmit
+            $query->where('status', '!=', 'draft');
+        }
+
+        // Ambil jumlah per status (group by)
+        $statusCounts = $query->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
+
+        $total = array_sum($statusCounts);
+
+        return [
+            'total' => $total,
+            'draft' => $statusCounts['draft'] ?? 0,
+            'submitted' => $statusCounts['submitted'] ?? 0,
+            'reviewed' => $statusCounts['reviewed'] ?? 0,
+            'approved' => $statusCounts['approved'] ?? 0,
+            'rejected' => $statusCounts['rejected'] ?? 0,
+        ];
+    }
 }
