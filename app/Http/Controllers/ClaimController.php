@@ -210,4 +210,37 @@ class ClaimController extends Controller
             ], 500);
         }
     }
+
+    // Method untuk mengambil Riwayat Klaim bagi Verifier dan Approver
+    public function getHistory(Request $request)
+    {
+        try {
+            $role = $request->user()->role->name;
+            $claims = [];
+
+            if ($role === 'Verifier') {
+                // Verifier bisa melihat yang sudah melewati tahap submit
+                $claims = Claim::whereIn('status', ['reviewed', 'approved', 'rejected'])->with('user')->get();
+            } elseif ($role === 'Approver') {
+                // Approver bisa melihat keputusan akhir
+                $claims = Claim::whereIn('status', ['approved', 'rejected'])->with('user')->get();
+            }
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Get History Berhasil',
+                'data' => $claims
+            ], 200);
+
+        } catch (\Exception $e) {
+            $message = $e->getMessage() . " | " . $e->getFile() . " | " . $e->getLine();
+            Log::critical($message);
+
+            return response()->json([
+                'code' => 500,
+                'message' => 'Gagal mengambil riwayat klaim',
+                'errors' => $message
+            ], 500);
+        }
+    }
 }

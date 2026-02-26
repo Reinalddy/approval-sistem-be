@@ -12,6 +12,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/claims/stats', [ClaimController::class, 'getStats']);
+    Route::get('/claims/history', [ClaimController::class, 'getHistory']);
     // ROLE: USER
     Route::middleware('role:User')->group(function () {
         Route::post('/claims', [ClaimController::class, 'store']);
