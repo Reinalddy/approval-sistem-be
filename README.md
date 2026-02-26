@@ -1,59 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Installation Guide - Approval System Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This guide will help you set up the Approval System backend project on your local machine.
 
-## About Laravel
+## Prerequisites
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Before you begin, ensure you have the following installed on your system:
+- **PHP**: `^8.2` or higher
+- **Composer**: Package manager for PHP
+- **Node.js & npm**: (Optional but recommended if Vite/frontend assets are used in the Laravel app)
+- **PostgreSQL**: The project is pre-configured to use PostgreSQL (`pgsql`)
+- **Git**: For version control
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Step-by-Step Installation
 
-## Learning Laravel
+### 1. Clone the Repository
+Clone the project repository to your local machine and navigate into the directory.
+```bash
+git clone <your-repo-url>
+cd approval-sistem-be
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 2. Install PHP Dependencies
+Run Composer to install all the required PHP packages defined in `composer.json`.
+```bash
+composer install
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 3. Setup Environment Variables
+Copy the example environment file to create your local `.env` file.
+```bash
+cp .env.example .env
+# On Windows Command Prompt you can use: copy .env.example .env
+```
 
-## Laravel Sponsors
+### 4. Configure the Database
+Open the newly created `.env` file in your code editor and update the database configuration to match your local PostgreSQL setup.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=approval_sistem_be  # Make sure this database is created in PostgreSQL
+DB_USERNAME=root                 # Your PostgreSQL username
+DB_PASSWORD=your_password        # Your PostgreSQL password
+```
+*Note: Make sure you have created an empty database named `approval_sistem_be` (or your chosen name) in pgAdmin or via the PostgreSQL CLI before proceeding.*
 
-### Premium Partners
+### 5. Generate Application Key
+Generate a unique application key. This sets the `APP_KEY` value in your `.env` file.
+```bash
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 6. Run Database Migrations
+Run the migrations to create the necessary tables in your database.
+```bash
+php artisan migrate
+```
 
-## Contributing
+### 7. Run Database Seeders (Crucial for RBAC)
+To populate the database with essential data like Roles (User, Verifier, Approver) and initial admin/test accounts, run the seeders:
+```bash
+php artisan db:seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 8. Link Storage (Optional but Recommended)
+If your application handles file uploads (like attachment uploads for claims), create a symbolic link from `public/storage` to `storage/app/public`.
+```bash
+php artisan storage:link
+```
 
-## Code of Conduct
+### 9. Run the Local Development Server
+Finally, start the Laravel development server.
+```bash
+php artisan serve
+```
+Your backend API should now be running at `http://localhost:8000`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Quick Setup Command (Alternative)
+If you want to run the automated setup commands defined in the `composer.json`, you can simply run:
+```bash
+composer run-script setup
+```
+*Note: You still need to make sure your database is created and configured in the `.env` file between the copy `.env` and `migrate` steps if the script fails, or configure the `.env` manually first.*
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## Testing the API
+You can now test the API endpoints using tools like Postman, Insomnia, or cURL.
+Start by hitting the login endpoint:
+- **POST** `http://localhost:8000/api/login`
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Refer to the [API_DOCS.md](./API_DOCS.md) for detailed information on available endpoints and required payloads.

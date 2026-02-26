@@ -159,15 +159,15 @@ class ClaimController extends Controller
         try {
             $claim = $this->claimService->updateStatus($id, $newStatus, $request->user()->id);
             return response()->json([
-                'success' => true,
+                'code' => 200,
                 'message' => "Status berhasil diubah menjadi {$newStatus}",
                 'data' => $claim
-            ]);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+                'code' => 500,
+                'message' => "Something went wrong"
+            ], 500);
         }
     }
 
